@@ -1,0 +1,48 @@
+============================================================
+  AiSOC — How to Run the Project
+  Gen AI Capstone Project | Group 4 | PCCOE
+============================================================
+
+STEP 1: Open TWO terminal windows/tabs
+
+
+STEP 2: In TERMINAL 1 — Start Backend
+----------------------------------------
+cd "/Users/shubhamnemade/College/Final Year/Gen AI Capstone Project/Project/OUR_AiSOC/backend"
+pip install -r requirements.txt
+python seed.py
+python -m uvicorn app.main:app --reload --port 8000
+
+(You should see: "Application startup complete", "Simulator Started", "NetworkMonitor Started")
+
+
+STEP 3: In TERMINAL 2 — Start Frontend
+----------------------------------------
+cd "/Users/shubhamnemade/College/Final Year/Gen AI Capstone Project/Project/OUR_AiSOC/frontend"
+pnpm install
+pnpm dev
+
+(You should see: "Ready in Xms")
+
+
+STEP 4: Open Browser
+----------------------------------------
+http://localhost:3000              — Dashboard
+http://localhost:3000/alerts       — Security Alerts
+http://localhost:3000/investigations — AI Investigations
+http://localhost:3000/evaluation   — Evaluation Metrics
+http://localhost:8000/docs         — API Documentation
+
+
+TO STOP:
+Press Ctrl+C in both terminals.
+
+============================================================
+  Optional: Add Gemini API Key for real AI
+============================================================
+1. Go to https://aistudio.google.com/apikey
+2. Copy your API key
+3. Edit the file: OUR_AiSOC/.env
+4. Set: GEMINI_API_KEY=your_key_here
+5. Restart the backend
+
