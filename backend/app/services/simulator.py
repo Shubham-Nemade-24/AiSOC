@@ -4,7 +4,7 @@ import random
 import uuid
 from datetime import datetime, timezone
 from app.database import async_session
-from app.models import Alert
+from app.models import Alert, apply_ocsf
 from app.services.ai_engine import triage_alert
 
 TEMPLATES = [
@@ -84,6 +84,7 @@ async def start_simulator(interval_min: int = 25, interval_max: int = 45):
             async with async_session() as db:
                 data = _generate_alert()
                 alert = Alert(**data)
+                apply_ocsf(alert)
                 db.add(alert)
                 await db.commit()
                 await db.refresh(alert)

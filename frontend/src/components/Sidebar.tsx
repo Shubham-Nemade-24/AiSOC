@@ -6,6 +6,7 @@ const NAV = [
   { href: "/", label: "Dashboard", icon: "📊" },
   { href: "/alerts", label: "Alerts", icon: "🚨" },
   { href: "/investigations", label: "Investigations", icon: "🔍" },
+  { href: "/evaluation", label: "Evaluation", icon: "📈" },
 ];
 
 export default function Sidebar() {
@@ -39,7 +40,18 @@ export default function Sidebar() {
           );
         })}
       </nav>
-      <div className="p-4 border-t border-soc-border">
+      <div className="p-4 border-t border-soc-border space-y-2">
+        <div className="px-3 py-2 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Synopsis Features
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {["OCSF", "SHA-256", "Pseudonymize", "Correlation", "Multi-Agent"].map((f) => (
+              <span key={f} className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 rounded text-[9px] font-medium">{f}</span>
+            ))}
+          </div>
+        </div>
         <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
           <p className="text-[10px] text-blue-400 uppercase tracking-wider font-semibold">Capstone Project</p>
           <p className="text-xs text-gray-400 mt-1">Group 4 · PCCOE Pune</p>

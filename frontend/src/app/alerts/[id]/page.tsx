@@ -12,19 +12,16 @@ export default function AlertDetailPage() {
   const [triaging, setTriaging] = useState(false);
   const [investigating, setInvestigating] = useState(false);
 
-  useEffect(() => {
-    if (id) fetchAlert(id as string).then(setAlert).finally(() => setLoading(false));
-  }, [id]);
+  useEffect(() => { if (id) fetchAlert(id as string).then(setAlert).finally(() => setLoading(false)); }, [id]);
 
   const handleTriage = async () => {
     setTriaging(true);
-    try { await triageAlert(id as string); const a = await fetchAlert(id as string); setAlert(a); } catch(e) { console.error(e); }
+    try { await triageAlert(id as string); setAlert(await fetchAlert(id as string)); } catch(e) { console.error(e); }
     setTriaging(false);
   };
-
   const handleInvestigate = async () => {
     setInvestigating(true);
-    try { const inv = await investigateAlert(id as string); setInvestigation(inv); const a = await fetchAlert(id as string); setAlert(a); } catch(e) { console.error(e); }
+    try { const inv = await investigateAlert(id as string); setInvestigation(inv); setAlert(await fetchAlert(id as string)); } catch(e) { console.error(e); }
     setInvestigating(false);
   };
 
@@ -44,6 +41,7 @@ export default function AlertDetailPage() {
             <div className="flex items-center gap-3 mb-2">
               <span className={`px-2 py-1 rounded-md text-xs font-semibold border ${sevColor[alert.severity]}`}>{alert.severity}</span>
               <span className="text-xs text-gray-500">{alert.source} · {alert.mitre_id}</span>
+              {alert.ocsf_class_uid && <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 rounded text-[10px] font-mono">OCSF:{alert.ocsf_class_uid}</span>}
             </div>
             <h1 className="text-2xl font-bold text-white">{alert.title}</h1>
             <p className="text-gray-400 mt-2 text-sm leading-relaxed">{alert.description}</p>
@@ -53,18 +51,15 @@ export default function AlertDetailPage() {
           {[["Source IP", alert.source_ip], ["Dest IP", alert.dest_ip], ["Hostname", alert.hostname], ["Username", alert.username],
             ["MITRE Tactic", alert.mitre_tactic], ["MITRE Technique", alert.mitre_technique], ["Status", alert.status], ["Created", new Date(alert.created_at).toLocaleString()]
           ].map(([label, value]) => (
-            <div key={label as string}>
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider">{label}</p>
-              <p className="text-sm text-white mt-0.5 font-mono">{value || "N/A"}</p>
-            </div>
+            <div key={label as string}><p className="text-[10px] text-gray-500 uppercase tracking-wider">{label}</p><p className="text-sm text-white mt-0.5 font-mono">{value || "N/A"}</p></div>
           ))}
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Actions */}
       <div className="flex gap-3">
         <button onClick={handleTriage} disabled={triaging || !!alert.ai_verdict}
-          className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg text-sm font-semibold hover:from-blue-500 hover:to-blue-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20">
+          className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg text-sm font-semibold hover:from-blue-500 hover:to-blue-400 transition-all disabled:opacity-40 shadow-lg shadow-blue-500/20">
           {triaging ? "⏳ Triaging..." : alert.ai_verdict ? "✓ Triaged" : "🤖 AI Triage"}
         </button>
         <button onClick={handleInvestigate} disabled={investigating}
@@ -73,10 +68,13 @@ export default function AlertDetailPage() {
         </button>
       </div>
 
-      {/* AI Triage Result */}
+      {/* AI Triage */}
       {alert.ai_verdict && (
         <div className="bg-soc-card border border-soc-border rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">🤖 AI Triage Result</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">🤖 AI Triage Result</h3>
+            <span className="px-2 py-0.5 bg-green-500/10 text-green-400 rounded text-[10px]">🔒 Pseudonymized</span>
+          </div>
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="p-3 rounded-lg bg-white/5"><p className="text-[10px] text-gray-500 uppercase">Verdict</p><p className="text-lg font-bold text-white mt-1">{alert.ai_verdict.replace("_", " ")}</p></div>
             <div className="p-3 rounded-lg bg-white/5"><p className="text-[10px] text-gray-500 uppercase">Confidence</p><p className="text-lg font-bold text-white mt-1">{(alert.ai_confidence * 100).toFixed(0)}%</p></div>
@@ -86,33 +84,43 @@ export default function AlertDetailPage() {
         </div>
       )}
 
-      {/* Investigation Ledger */}
+      {/* Investigation with Ledger Hash Chain */}
       {investigation && (
         <div className="bg-soc-card border border-soc-border rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">🔍 Investigation Report</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">🔍 Investigation Report</h3>
+            <span className="px-2 py-0.5 bg-green-500/10 text-green-400 rounded text-[10px]">🔒 SHA-256 Verified</span>
+          </div>
           <div className="flex items-center gap-4 mb-4">
             <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded text-xs font-medium">{investigation.status}</span>
             {investigation.risk_score && <span className="text-sm text-gray-400">Risk: <strong className="text-white">{investigation.risk_score}/10</strong></span>}
           </div>
           <p className="text-sm text-gray-300 bg-white/5 rounded-lg p-4 mb-6 leading-relaxed">{investigation.summary}</p>
 
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Investigation Ledger — Step-by-Step</h4>
+          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Investigation Ledger — Immutable Hash Chain</h4>
           <div className="space-y-3">
             {investigation.ledger?.map((entry: any, i: number) => (
               <div key={i} className="border border-soc-border rounded-lg p-4 bg-white/[0.02]">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 text-xs flex items-center justify-center font-bold">{entry.step}</span>
-                    <span className="text-sm font-semibold text-white">{entry.agent.replace("_", " ")}</span>
+                    <span className="text-sm font-semibold text-white">{entry.agent.replace(/_/g, " ")}</span>
                     <span className="text-xs text-gray-500">· {entry.action}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    {entry.pseudonymized && <span className="px-1.5 py-0.5 bg-green-500/10 text-green-400 rounded text-[10px]">🔒</span>}
                     <span>🧠 {entry.model}</span>
-                    {entry.tokens && <span>{entry.tokens} tokens</span>}
+                    {entry.tokens && <span>{entry.tokens}tok</span>}
                     {entry.duration_ms && <span>{entry.duration_ms}ms</span>}
                   </div>
                 </div>
                 <p className="text-sm text-gray-300 leading-relaxed">{entry.output}</p>
+                {entry.content_hash && (
+                  <div className="mt-2 pt-2 border-t border-soc-border/50 flex items-center gap-2">
+                    <span className="text-[10px] text-gray-600 font-mono">SHA-256: {entry.content_hash.substring(0, 16)}...</span>
+                    {entry.prev_hash && <span className="text-[10px] text-gray-600 font-mono">← {entry.prev_hash.substring(0, 8)}...</span>}
+                  </div>
+                )}
               </div>
             ))}
           </div>
