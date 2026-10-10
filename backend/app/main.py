@@ -15,6 +15,7 @@ from app.database import init_db
 from app.routes.alerts import router as alerts_router
 from app.routes.dashboard import router as dashboard_router
 from app.routes.investigations import router as investigations_router
+from app.routes.demo import router as demo_router
 from app.services.simulator import start_simulator, stop_simulator
 from app.services.network_monitor import start_network_monitor, stop_network_monitor
 from app.services.correlation import start_correlation_engine, stop_correlation_engine
@@ -47,13 +48,14 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["*"],  # Allow all origins for demo (phone access)
     allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
 )
 
 app.include_router(alerts_router)
 app.include_router(dashboard_router)
 app.include_router(investigations_router)
+app.include_router(demo_router)
 
 @app.get("/")
 async def root():
@@ -61,7 +63,8 @@ async def root():
             "project": "Gen AI Capstone — Group 4, PCCOE Pune",
             "services": ["simulator", "network_monitor", "correlation_engine"],
             "features": ["ocsf_normalization", "pseudonymization", "sha256_ledger",
-                         "multi_agent_pipeline", "alert_correlation"]}
+                         "multi_agent_pipeline", "alert_correlation"],
+            "demo": "Open /demo on your phone to trigger live alerts"}
 
 @app.get("/health")
 async def health():

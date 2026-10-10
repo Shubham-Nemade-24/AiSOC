@@ -11,8 +11,9 @@ STEP 2: In TERMINAL 1 — Start Backend
 cd "/Users/shubhamnemade/College/Final Year/Gen AI Capstone Project/Project/OUR_AiSOC/backend"
 pip install -r requirements.txt
 python seed.py
-python -m uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
+(NOTE: --host 0.0.0.0 makes it accessible from your PHONE)
 (You should see: "Application startup complete", "Simulator Started", "NetworkMonitor Started")
 
 
@@ -25,7 +26,7 @@ pnpm dev
 (You should see: "Ready in Xms")
 
 
-STEP 4: Open Browser
+STEP 4: Open Browser on Laptop
 ----------------------------------------
 http://localhost:3000              — Dashboard
 http://localhost:3000/alerts       — Security Alerts
@@ -34,8 +35,41 @@ http://localhost:3000/evaluation   — Evaluation Metrics
 http://localhost:8000/docs         — API Documentation
 
 
-TO STOP:
-Press Ctrl+C in both terminals.
+============================================================
+  LIVE DEMO — Trigger Alerts from Phone
+============================================================
+
+STEP 1: Connect your PHONE to the same WiFi as your laptop
+
+STEP 2: Find your laptop's IP:
+   - Run in terminal: ipconfig getifaddr en0
+   - It will show something like: 192.168.1.XX
+
+STEP 3: On your PHONE browser, open:
+   http://192.168.1.XX:8000/demo
+
+STEP 4: You'll see a page with attack trigger buttons:
+   🔴 Ransomware Attack (critical)
+   🔴 Malware Detected (critical)
+   🟠 Brute Force Login (high)
+   🟠 Port Scan (high)
+   🟡 Suspicious Login (medium)
+   🟡 Data Exfiltration (medium)
+   🔵 Recon Activity (low)
+   📱 New Device Detected (medium)
+
+STEP 5: Tap any button — the alert will appear LIVE on
+        your laptop's SOC Dashboard (http://localhost:3000)!
+
+DEMO FLOW SUGGESTION:
+   1. Show dashboard running live on laptop projector
+   2. Pull out phone, explain "Now I'll simulate an attacker"
+   3. Tap "Ransomware Attack" on phone
+   4. Watch it appear on dashboard in real-time
+   5. Click on the alert → Show AI Triage result
+   6. Click "Full AI Investigation" → Show 4-agent pipeline
+   7. Go to Evaluation page → Show metrics updating
+   8. Show "Network Monitor" alerts appearing automatically
 
 ============================================================
   Optional: Add Gemini API Key for real AI
